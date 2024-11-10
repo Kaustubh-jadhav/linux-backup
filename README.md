@@ -26,3 +26,14 @@ This helps to ensure that backups don't accumulate indefinitely and take up unne
 ## Log Files:
 
 The log file (/var/log/backup_script.log) will contain a timestamped entry of each action performed by the script. This makes it easy to track the success or failure of the backup.
+Email Configuration:
+
+The variable EMAIL holds the email address for notifications.
+send_email Function:
+
+This function sends the email with a subject and body. It uses the mail command (you can also use sendmail if preferred).
+Email on Success/Failure:
+
+Email notifications are sent on success or failure of key actions like creating directories, starting the backup, or cleaning old backups.
+Requirements:
+You need a mail utility installed on the server. On most Linux systems, mail or mailx should work, but if not, you may need to install it using a package manager (e.g., sudo yum install mailx on CentOS/RHEL or sudo apt install mailutils on Ubuntu).

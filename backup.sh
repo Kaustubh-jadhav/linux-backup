@@ -7,10 +7,18 @@ LOG_FILE="/var/log/backup_script.log" # Log file location
 DATE=$(date +"%Y%m%d_%H%M%S")       # Timestamp for the backup
 BACKUP_NAME="backup_$DATE.tar.gz"   # Backup filename
 BACKUP_PATH="$DEST_DIR/$BACKUP_NAME" # Full path to the backup file
+EMAIL="your_email@example.com"      # Email to send notifications
 
 # Function to create the log entry
 log_message() {
     echo "$(date +"%Y-%m-%d %H:%M:%S") - $1" >> "$LOG_FILE"
+}
+
+# Send email notification
+send_email() {
+    SUBJECT=$1
+    BODY=$2
+    echo "$BODY" | mail -s "$SUBJECT" "$EMAIL"
 }
 
 # Ensure the backup destination exists
@@ -21,6 +29,7 @@ if [ ! -d "$DEST_DIR" ]; then
         log_message "Successfully created destination directory $DEST_DIR."
     else
         log_message "Error creating destination directory $DEST_DIR."
+        send_email "Backup Failed" "Error creating destination directory $DEST_DIR."
         exit 1
     fi
 fi
@@ -28,6 +37,7 @@ fi
 # Check if source directory exists
 if [ ! -d "$SOURCE_DIR" ]; then
     log_message "Source directory $SOURCE_DIR does not exist. Backup cannot proceed."
+    send_email "Backup Failed" "Source directory $SOURCE_DIR does not exist."
     exit 1
 fi
 
@@ -40,8 +50,10 @@ tar -czf "$BACKUP_PATH" -C "$SOURCE_DIR" . &> /dev/null
 # Check if the backup was successful
 if [ $? -eq 0 ]; then
     log_message "Backup completed successfully: $BACKUP_PATH."
+    send_email "Backup Success" "Backup completed successfully: $BACKUP_PATH."
 else
     log_message "Backup failed for $SOURCE_DIR."
+    send_email "Backup Failed" "Backup failed for $SOURCE_DIR."
     exit 1
 fi
 
